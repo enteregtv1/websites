@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tanks, 1917 to today</title>
+<style>
+:root{
+  --bg:#e9ebe8;--panel:#f6f7f5;--ink:#1c242b;--muted:#5a666f;--line:#c4cac8;
+  --e-wwi:#8a6a2f;--e-inter:#4f7a62;--e-wwii:#a2473a;--e-cold:#3a6a8e;--e-mod:#7b5a98;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#161c21;--panel:#1f272d;--ink:#e6e9e6;--muted:#9aa5ac;--line:#35414a;
+    --e-wwi:#c79a4a;--e-inter:#78b08f;--e-wwii:#e0705f;--e-cold:#6aa4cc;--e-mod:#b393d2;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161c21;--panel:#1f272d;--ink:#e6e9e6;--muted:#9aa5ac;--line:#35414a;
+  --e-wwi:#c79a4a;--e-inter:#78b08f;--e-wwii:#e0705f;--e-cold:#6aa4cc;--e-mod:#b393d2;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
+.wrap{max-width:68rem;margin:0 auto;padding:2rem 1.25rem 3rem}
+h1,h2,h3,button,.num{font-family:"Arial Narrow","Helvetica Neue",Arial,sans-serif;font-stretch:condensed}
+h1{font-size:clamp(2.6rem,9vw,5.5rem);line-height:.95;margin:.5rem 0 1rem;letter-spacing:-.01em;font-weight:800}
+.lede{max-width:38rem;color:var(--muted);font-size:1.1rem;margin:0 0 2.5rem}
+h2{font-size:1.5rem;margin:0 0 .25rem}
+.sub{color:var(--muted);margin:0 0 1.25rem;font-size:.95rem;max-width:40rem}
+.chart{background:var(--panel);border:1px solid var(--line);padding:1.25rem 1rem;margin-bottom:2rem}
+.row{display:grid;grid-template-columns:9.5rem 1fr 3.2rem;gap:.75rem;align-items:center;padding:.22rem 0;font-size:.9rem}
+.row .nm{font-family:"Arial Narrow","Helvetica Neue",Arial,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .yr{color:var(--muted)}
+.track{height:.9rem;background:transparent}
+.bar{height:100%;background:var(--c);transition:width .5s ease,opacity .3s}
+.row.off{display:none}
+.row .num{text-align:right;font-variant-numeric:tabular-nums}
+.filters{display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 1.25rem}
+button{font-size:.95rem;padding:.5rem .9rem;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;border-radius:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible{outline:3px solid var(--e-cold);outline-offset:2px}
+.era-intro{margin:0 0 1.25rem;max-width:44rem;border-left:4px solid var(--c);padding-left:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(17rem,1fr));gap:1rem}
+.card{background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--c);padding:1rem 1.1rem 1.1rem}
+.card h3{font-size:1.45rem;margin:0}
+.meta{margin:0 0 .75rem;color:var(--muted);font-size:.9rem}
+dl{display:grid;grid-template-columns:auto 1fr;gap:.15rem .9rem;margin:0 0 .75rem;font-size:.92rem}
+dt{color:var(--muted)}dd{margin:0}
+.card p.note{margin:0;font-size:.97rem}
+.card.off{display:none}
+footer{margin-top:2.5rem;color:var(--muted);font-size:.88rem;max-width:40rem}
+@media (max-width:30rem){.row{grid-template-columns:6.5rem 1fr 2.8rem;font-size:.82rem}}
+@media (prefers-reduced-motion:reduce){.bar{transition:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>A century of tanks</h1>
+  <p class="lede">From muddy trench-crossers to computer-aimed gun platforms. Browse 17 landmark tanks by era and see how much heavier they became.</p>
+
+  <section class="chart" aria-labelledby="ch">
+    <h2 id="ch">Weight over time</h2>
+    <p class="sub">Approximate combat weight in tonnes, in order of entering service. Weights vary by variant.</p>
+    <div id="bars"></div>
+  </section>
+
+  <div class="filters" id="filters" role="group" aria-label="Filter by era"></div>
+  <p class="era-intro" id="intro"></p>
+  <div class="grid" id="grid"></div>
+
+  <footer>Figures are rounded and vary by source and variant. Production counts include all major versions unless noted.</footer>
+</main>
+
+<script>
+const ERAS={
+  all:{label:"All eras",c:"var(--ink)",text:"Every tank in the collection, oldest first."},
+  wwi:{label:"World War I",c:"var(--e-wwi)",text:"1914–1918. Armored, tracked vehicles appear to break the stalemate of trench warfare. Slow, cramped and unreliable, they still changed how wars were fought."},
+  inter:{label:"Interwar",c:"var(--e-inter)",text:"1919–1938. Designers test ideas about speed, armor and turrets, and cheap exportable tanks spread around the world."},
+  wwii:{label:"World War II",c:"var(--e-wwii)",text:"1939–1945. Tanks become the core of mobile warfare. Armor and guns escalate fast, and production scale often matters as much as quality."},
+  cold:{label:"Cold War",c:"var(--e-cold)",text:"1946–1991. NATO and Warsaw Pact designs evolve from the first main battle tanks to gas-turbine and composite-armor machines."},
+  mod:{label:"Modern",c:"var(--e-mod)",text:"1992 onward. Advanced armor, digital fire control and active protection define today's heavy, expensive tanks."}
+};
+const T=[
+ ["Mark IV","UK",1917,"wwi",28,"6-pdr guns or machine guns",8,"~1,200","The rhomboid hull let it cross wide trenches. Crews endured heat, noise and fumes."],
+ ["Renault FT","France",1917,"wwi",7,"37 mm gun or machine gun",2,"3,000+","Set the template: a fully rotating turret, a rear engine and a driver in front."],
+ ["A7V","Germany",1918,"wwi",30,"57 mm gun and machine guns",18,"20","Germany's main WWI tank design, but only twenty were built."],
+ ["Vickers 6-Ton","UK",1928,"inter",7,"47 mm gun or machine guns",3,"Hundreds","An export hit. The Soviet T-26 and Polish 7TP grew from it."],
+ ["Panzer IV","Germany",1939,"wwii",25,"75 mm gun",5,"~8,500","The only German tank built for the whole war, upgraded from a short to a long gun."],
+ ["T-34","USSR",1940,"wwii",27,"76 mm, later 85 mm",4,"80,000+","Sloped armor, wide tracks and a diesel engine made it a benchmark design."],
+ ["M4 Sherman","USA",1942,"wwii",30,"75 mm or 76 mm",5,"~49,000","Reliable and easy to mass-produce and repair. Many variants served for decades."],
+ ["Tiger I","Germany",1942,"wwii",57,"88 mm gun",5,"1,347","Thick armor and a powerful gun, but costly, complex and fuel-hungry."],
+ ["Panther","Germany",1943,"wwii",45,"75 mm long gun",5,"~6,000","Paired sloped armor with a high-velocity gun and influenced postwar designs."],
+ ["Centurion","UK",1946,"cold",51,"20-pdr, later 105 mm",4,"~4,400","A long-serving design that fought in many conflicts and was exported widely."],
+ ["T-54/55","USSR",1948,"cold",36,"100 mm gun",4,"~100,000","Often called the most-produced tank ever. Low, simple and rugged."],
+ ["M48 Patton","USA",1952,"cold",45,"90 mm gun",4,"~12,000","The main US tank of the 1950s and 60s, with a distinctive rounded turret."],
+ ["Leopard 2","Germany",1979,"cold",60,"120 mm smoothbore",4,"3,500+","Balanced firepower, armor and mobility. Widely exported across Europe and beyond."],
+ ["M1 Abrams","USA",1980,"cold",60,"105 mm, later 120 mm",4,"10,000+","A gas-turbine engine and composite armor. The main US tank since the 1980s."],
+ ["Challenger 2","UK",1998,"mod",63,"120 mm rifled gun",4,"~450","Keeps a rifled gun while most peers use smoothbores."],
+ ["Merkava IV","Israel",2004,"mod",65,"120 mm smoothbore",4,"Ongoing","Puts the engine at the front to protect the crew and can carry infantry in the rear."],
+ ["K2 Black Panther","South Korea",2014,"mod",55,"120 mm smoothbore",3,"Ongoing","An autoloader allows a three-person crew, and an adjustable suspension helps on rough terrain."]
+];
+const maxM=Math.max(...T.map(t=>t[4]));
+const bars=document.getElementById("bars"),grid=document.getElementById("grid"),
+      filters=document.getElementById("filters"),intro=document.getElementById("intro");
+const col=k=>`var(--e-${k})`;
+bars.innerHTML=T.map(t=>`<div class="row" data-era="${t[3]}"><span class="nm">${t[0]} <span class="yr">${t[2]}</span></span><div class="track"><div class="bar" style="--c:${col(t[3])};width:${t[4]/maxM*100}%"></div></div><span class="num">${t[4]} t</span></div>`).join("");
+grid.innerHTML=T.map(t=>`<article class="card" data-era="${t[3]}" style="--c:${col(t[3])}"><h3>${t[0]}</h3><p class="meta">${t[1]}, ${t[2]}</p><dl><dt>Weight</dt><dd>~${t[4]} t</dd><dt>Main gun</dt><dd>${t[5]}</dd><dt>Crew</dt><dd>${t[6]}</dd><dt>Built</dt><dd>${t[7]}</dd></dl><p class="note">${t[8]}</p></article>`).join("");
+filters.innerHTML=Object.keys(ERAS).map(k=>`<button type="button" data-k="${k}" aria-pressed="${k==="all"}">${ERAS[k].label}</button>`).join("");
+function show(k){
+  document.querySelectorAll("[data-era]").forEach(el=>el.classList.toggle("off",k!=="all"&&el.dataset.era!==k));
+  filters.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===k));
+  intro.textContent=ERAS[k].text;intro.style.setProperty("--c",ERAS[k].c);
+}
+filters.addEventListener("click",e=>{const b=e.target.closest("button");if(b)show(b.dataset.k)});
+show("all");
+</script>
+</body>
+</html>

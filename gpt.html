@@ -1,0 +1,761 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore the history of tanks from World War I to the modern era.">
+  <title>Armor Archive | Tank Encyclopedia</title>
+
+  <style>
+    :root {
+      --bg: #111611;
+      --panel: #1b231b;
+      --panel2: #252f24;
+      --green: #8ca477;
+      --sand: #d6c8a4;
+      --text: #e9eadf;
+      --muted: #a4ad9e;
+      --border: #354032;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #151c15f5;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav {
+      max-width: 1200px;
+      margin: auto;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .logo span { color: var(--green); }
+
+    nav { display: flex; gap: 22px; }
+    nav a { color: var(--muted); font-size: .9rem; }
+    nav a:hover { color: var(--sand); }
+
+    .hero {
+      padding: 90px 24px;
+      background:
+        linear-gradient(90deg, #111611 5%, #111611dd 48%, #11161155),
+        url("https://images.unsplash.com/photo-1518709594023-6eab9bab7b23?auto=format&fit=crop&w=1800&q=80")
+        center/cover;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-inner {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .eyebrow {
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: .78rem;
+      font-weight: bold;
+    }
+
+    h1 {
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      line-height: 1.05;
+      margin: 18px 0;
+      max-width: 750px;
+    }
+
+    h1 span { color: var(--sand); }
+
+    .hero p {
+      max-width: 580px;
+      color: #c3c9bd;
+      font-size: 1.1rem;
+    }
+
+    .button {
+      display: inline-block;
+      margin-top: 20px;
+      background: var(--green);
+      color: #111611;
+      padding: 13px 22px;
+      border: 0;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .button:hover { background: var(--sand); }
+
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 55px 24px;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    h2 { margin: 0; font-size: 2rem; }
+    .subheading { color: var(--muted); margin: 6px 0 0; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 12px;
+      margin: 25px 0;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px;
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font: inherit;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid var(--green);
+      outline-offset: 2px;
+    }
+
+    .era-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .era-button {
+      padding: 9px 15px;
+      background: var(--panel);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .era-button.active,
+    .era-button:hover {
+      color: var(--text);
+      background: #354531;
+      border-color: var(--green);
+    }
+
+    .results-line {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-bottom: 15px;
+    }
+
+    .tank-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .tank-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      overflow: hidden;
+      transition: transform .2s, border-color .2s;
+    }
+
+    .tank-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--green);
+    }
+
+    .tank-image {
+      width: 100%;
+      height: 205px;
+      object-fit: cover;
+      display: block;
+      background: var(--panel2);
+    }
+
+    .tank-info { padding: 18px; }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      background: #344331;
+      color: #d2ddc7;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 3px;
+    }
+
+    .tank-info h3 { margin: 12px 0 3px; font-size: 1.3rem; }
+    .nation { color: var(--muted); font-size: .9rem; }
+
+    .specs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 15px 0;
+      margin-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .spec-label {
+      display: block;
+      color: var(--muted);
+      font-size: .75rem;
+    }
+
+    .spec-value { font-size: .92rem; font-weight: bold; }
+
+    .details-button {
+      width: 100%;
+      padding: 11px;
+      color: var(--sand);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .details-button:hover {
+      background: var(--panel2);
+      border-color: var(--green);
+    }
+
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--muted);
+      background: var(--panel);
+      border-radius: 6px;
+    }
+
+    .history {
+      margin-top: 80px;
+      padding: 35px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+    }
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 25px;
+    }
+
+    .history-item {
+      border-left: 2px solid var(--green);
+      padding-left: 15px;
+    }
+
+    .history-item strong {
+      display: block;
+      color: var(--sand);
+      font-size: 1.1rem;
+    }
+
+    .history-item p { color: var(--muted); font-size: .9rem; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    dialog {
+      width: min(600px, calc(100% - 30px));
+      max-height: 85vh;
+      overflow: auto;
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      padding: 26px;
+    }
+
+    dialog::backdrop { background: #000b; }
+    dialog h2 { margin: 14px 0; }
+    dialog p { color: #c1c9bc; }
+    .close-button { float: right; }
+
+    @media (max-width: 850px) {
+      .tank-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .history-grid { grid-template-columns: repeat(2, 1fr); }
+      nav { gap: 12px; }
+    }
+
+    @media (max-width: 560px) {
+      .nav { padding: 15px; }
+      nav a:not(:last-child) { display: none; }
+      .hero { padding: 65px 20px; }
+      main { padding: 40px 16px; }
+      .controls { grid-template-columns: 1fr; }
+      .tank-grid { grid-template-columns: 1fr; }
+      .history { padding: 22px; }
+      .history-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="nav">
+      <a class="logo" href="#">ARMOR<span> ARCHIVE</span></a>
+      <nav aria-label="Main navigation">
+        <a href="#collection">Collection</a>
+        <a href="#timeline">Timeline</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">An independent tank encyclopedia</div>
+      <h1>Steel. Firepower.<br><span>History.</span></h1>
+      <p>
+        Explore the evolution of armored warfare, from the first
+        rhomboid tanks of the Great War to today's main battle tanks.
+      </p>
+      <a class="button" href="#collection">Explore the collection →</a>
+    </div>
+  </section>
+
+  <main>
+    <section id="collection">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">The vehicle database</div>
+          <h2>Tank Collection</h2>
+          <p class="subheading">Explore machines from different nations and eras.</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <input id="search" type="search"
+          placeholder="Search tanks, countries, or armament..."
+          aria-label="Search tanks">
+        <select id="sort" aria-label="Sort tanks">
+          <option value="year">Oldest first</option>
+          <option value="newest">Newest first</option>
+          <option value="name">Name A–Z</option>
+          <option value="weight">Weight: lightest first</option>
+        </select>
+      </div>
+
+      <div class="era-list" id="eraFilters">
+        <button class="era-button active" data-era="All">All eras</button>
+        <button class="era-button" data-era="WWI">World War I</button>
+        <button class="era-button" data-era="WWII">World War II</button>
+        <button class="era-button" data-era="Cold War">Cold War</button>
+        <button class="era-button" data-era="Modern">Modern</button>
+        <button class="era-button" data-era="Future">Future</button>
+      </div>
+
+      <div class="results-line" id="resultCount" aria-live="polite"></div>
+      <div class="tank-grid" id="tankGrid"></div>
+    </section>
+
+    <section class="history" id="timeline">
+      <div class="eyebrow">A century of innovation</div>
+      <h2>Through the Ages</h2>
+      <div class="history-grid">
+        <div class="history-item">
+          <strong>1916–1918</strong>
+          <h3>The Beginning</h3>
+          <p>Early tanks cross trenches and barbed wire during World War I.</p>
+        </div>
+        <div class="history-item">
+          <strong>1939–1945</strong>
+          <h3>World War II</h3>
+          <p>Mass production, mobile warfare, and specialized tank designs.</p>
+        </div>
+        <div class="history-item">
+          <strong>1946–1991</strong>
+          <h3>The Cold War</h3>
+          <p>Composite armor, smoothbore guns, and main battle tanks emerge.</p>
+        </div>
+        <div class="history-item">
+          <strong>1991–Today</strong>
+          <h3>The Modern Era</h3>
+          <p>Digital sights, advanced protection, and networked combat systems.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" style="margin-top:65px">
+      <div class="eyebrow">About the project</div>
+      <h2>Preserving Armored History</h2>
+      <p class="subheading" style="max-width:750px">
+        Armor Archive is a tank-history project covering vehicle design,
+        national service, technical specifications, and the evolution
+        of armored warfare. Specifications are simplified for this demo;
+        consult reliable references for detailed historical research.
+      </p>
+    </section>
+  </main>
+
+  <dialog id="tankDialog">
+    <button class="details-button close-button"
+      onclick="document.getElementById('tankDialog').close()">
+      Close ✕
+    </button>
+    <div id="dialogContent"></div>
+  </dialog>
+
+  <footer>
+    ARMOR ARCHIVE · A TANK HISTORY PROJECT · Educational use
+  </footer>
+
+  <script>
+    // Add new tank records to this array to expand the encyclopedia.
+    const tanks = [
+      {
+        name: "Mark IV",
+        nation: "United Kingdom",
+        year: 1917,
+        era: "WWI",
+        type: "Heavy tank",
+        weight: 28.4,
+        gun: "2 × 6-pounder guns (Male)",
+        armor: "Up to 12 mm",
+        crew: 8,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Mark%20IV%20tank%20%28British%29.jpg",
+        description: "One of the most recognizable British tanks of World War I. Its rhomboid tracks were designed to cross trenches and difficult battlefield terrain."
+      },
+      {
+        name: "Renault FT",
+        nation: "France",
+        year: 1917,
+        era: "WWI",
+        type: "Light tank",
+        weight: 6.5,
+        gun: "37 mm Puteaux SA 18 or machine gun",
+        armor: "Up to 22 mm",
+        crew: 2,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Renault%20FT%20tank.jpg",
+        description: "A highly influential early tank with a rotating turret, rear engine, and a layout that shaped many later tank designs."
+      },
+      {
+        name: "M4 Sherman",
+        nation: "United States",
+        year: 1942,
+        era: "WWII",
+        type: "Medium tank",
+        weight: 30.3,
+        gun: "75 mm M3 (early versions)",
+        armor: "Varies by version",
+        crew: 5,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/M4%20Sherman%20tank.jpg",
+        description: "The principal American medium tank of World War II, valued for mass production, reliability, and ease of maintenance."
+      },
+      {
+        name: "Tiger I",
+        nation: "Germany",
+        year: 1942,
+        era: "WWII",
+        type: "Heavy tank",
+        weight: 57,
+        gun: "88 mm KwK 36 L/56",
+        armor: "Up to 120 mm",
+        crew: 5,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Tiger%20I%20tank.jpg",
+        description: "A German heavy tank known for its powerful 88 mm gun and heavy armor. Its weight and mechanical complexity created logistical challenges."
+      },
+      {
+        name: "T-34",
+        nation: "Soviet Union",
+        year: 1940,
+        era: "WWII",
+        type: "Medium tank",
+        weight: 26.5,
+        gun: "76.2 mm F-34 (T-34/76)",
+        armor: "Varies by version",
+        crew: 4,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/T-34%20tank.jpg",
+        description: "A Soviet medium tank that combined sloped armor, wide tracks, and a diesel engine. Later versions received a larger turret and 85 mm gun."
+      },
+      {
+        name: "Centurion",
+        nation: "United Kingdom",
+        year: 1945,
+        era: "Cold War",
+        type: "Main battle tank",
+        weight: 52,
+        gun: "Varied; later versions used 105 mm L7",
+        armor: "Varies by mark",
+        crew: 4,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Centurion%20tank.jpg",
+        description: "A postwar British tank family that served in numerous conflicts and remained in service with several countries for decades."
+      },
+      {
+        name: "M60 Patton",
+        nation: "United States",
+        year: 1960,
+        era: "Cold War",
+        type: "Main battle tank",
+        weight: 46,
+        gun: "105 mm M68",
+        armor: "Cast steel; varies by version",
+        crew: 4,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/M60%20Patton%20tank.jpg",
+        description: "An American main battle tank used extensively during the Cold War. Upgrades extended its service life in multiple countries."
+      },
+      {
+        name: "T-72",
+        nation: "Soviet Union",
+        year: 1973,
+        era: "Cold War",
+        type: "Main battle tank",
+        weight: 41,
+        gun: "125 mm 2A46 series",
+        armor: "Steel and composite, version-dependent",
+        crew: 3,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/T-72%20tank.jpg",
+        description: "A widely exported Soviet-designed tank with an autoloader, a three-person crew, and numerous national modernization packages."
+      },
+      {
+        name: "Leopard 2",
+        nation: "Germany",
+        year: 1979,
+        era: "Modern",
+        type: "Main battle tank",
+        weight: 55,
+        gun: "120 mm smoothbore",
+        armor: "Composite; configuration-dependent",
+        crew: 4,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Leopard%202%20A6%20tank.jpg",
+        description: "A German main battle tank family known for its 120 mm gun, strong mobility, and continued development through successive variants."
+      },
+      {
+        name: "M1 Abrams",
+        nation: "United States",
+        year: 1980,
+        era: "Modern",
+        type: "Main battle tank",
+        weight: 54.5,
+        gun: "105 mm M68A1 on initial production models",
+        armor: "Composite; varies by version",
+        crew: 4,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/M1%20Abrams%20tank.jpg",
+        description: "An American tank family with a gas-turbine engine, advanced fire-control systems, and extensive upgrades over its service life."
+      },
+      {
+        name: "Type 10",
+        nation: "Japan",
+        year: 2010,
+        era: "Modern",
+        type: "Main battle tank",
+        weight: 44,
+        gun: "120 mm smoothbore",
+        armor: "Modular composite; details vary",
+        crew: 3,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/Type%2010%20tank.jpg",
+        description: "A Japanese main battle tank designed for mobility, digital battlefield integration, and adaptable armor packages."
+      },
+      {
+        name: "T-14 Armata",
+        nation: "Russia",
+        year: 2015,
+        era: "Future",
+        type: "Next-generation tank design",
+        weight: 55,
+        gun: "125 mm smoothbore (announced)",
+        armor: "Reported layered protection",
+        crew: 3,
+        image: "https://commons.wikimedia.org/wiki/Special:FilePath/T-14%20Armata.jpg",
+        description: "A Russian tank design featuring an unmanned turret and an armored crew capsule. Publicly announced capabilities and operational status should be distinguished from independently verified deployment."
+      }
+    ];
+
+    const grid = document.getElementById("tankGrid");
+    const search = document.getElementById("search");
+    const sort = document.getElementById("sort");
+    const resultCount = document.getElementById("resultCount");
+    const dialog = document.getElementById("tankDialog");
+    const dialogContent = document.getElementById("dialogContent");
+
+    let selectedEra = "All";
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function renderTanks() {
+      const query = search.value.trim().toLowerCase();
+
+      let filtered = tanks.filter(tank => {
+        const matchesEra =
+          selectedEra === "All" || tank.era === selectedEra;
+
+        const searchable = [
+          tank.name, tank.nation, tank.era,
+          tank.type, tank.gun, tank.description
+        ].join(" ").toLowerCase();
+
+        return matchesEra && searchable.includes(query);
+      });
+
+      if (sort.value === "newest") {
+        filtered.sort((a, b) => b.year - a.year);
+      } else if (sort.value === "name") {
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+      } else if (sort.value === "weight") {
+        filtered.sort((a, b) => a.weight - b.weight);
+      } else {
+        filtered.sort((a, b) => a.year - b.year);
+      }
+
+      resultCount.textContent =
+        `${filtered.length} tank${filtered.length === 1 ? "" : "s"} found`;
+
+      if (!filtered.length) {
+        grid.innerHTML = `
+          <div class="empty">
+            <h3>No tanks found</h3>
+            <p>Try another name, nation, or era.</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(tank => `
+        <article class="tank-card">
+          <img class="tank-image"
+            src="${escapeHTML(tank.image)}"
+            alt="${escapeHTML(tank.name)} tank"
+            loading="lazy"
+            onerror="this.onerror=null;this.src='https://placehold.co/700x400/252f24/e9eadf?text=Tank+Photo';">
+          <div class="tank-info">
+            <span class="tag">${escapeHTML(tank.era)}</span>
+            <h3>${escapeHTML(tank.name)}</h3>
+            <div class="nation">${escapeHTML(tank.nation)} · ${tank.year}</div>
+            <div class="specs">
+              <div>
+                <span class="spec-label">Vehicle type</span>
+                <span class="spec-value">${escapeHTML(tank.type)}</span>
+              </div>
+              <div>
+                <span class="spec-label">Weight</span>
+                <span class="spec-value">${tank.weight} tonnes</span>
+              </div>
+              <div>
+                <span class="spec-label">Main armament</span>
+                <span class="spec-value">${escapeHTML(tank.gun)}</span>
+              </div>
+              <div>
+                <span class="spec-label">Crew</span>
+                <span class="spec-value">${tank.crew}</span>
+              </div>
+            </div>
+            <button class="details-button"
+              data-tank="${escapeHTML(tank.name)}">
+              View full profile →
+            </button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function showTank(name) {
+      const tank = tanks.find(item => item.name === name);
+      if (!tank) return;
+
+      dialogContent.innerHTML = `
+        <span class="tag">${escapeHTML(tank.era)}</span>
+        <h2>${escapeHTML(tank.name)}</h2>
+        <p>${escapeHTML(tank.nation)} · Introduced ${tank.year}</p>
+        <img src="${escapeHTML(tank.image)}"
+          alt="${escapeHTML(tank.name)}"
+          style="width:100%;max-height:280px;object-fit:cover;border-radius:5px"
+          onerror="this.style.display='none'">
+        <p>${escapeHTML(tank.description)}</p>
+        <h3>Specifications</h3>
+        <p><strong>Classification:</strong> ${escapeHTML(tank.type)}</p>
+        <p><strong>Combat weight:</strong> ${tank.weight} tonnes (approx.)</p>
+        <p><strong>Main armament:</strong> ${escapeHTML(tank.gun)}</p>
+        <p><strong>Armor:</strong> ${escapeHTML(tank.armor)}</p>
+        <p><strong>Crew:</strong> ${tank.crew}</p>
+        <p style="font-size:.8rem">
+          Specifications may differ between variants. Verify details
+          against reliable historical and technical references.
+        </p>
+      `;
+
+      dialog.showModal();
+    }
+
+    document.getElementById("eraFilters").addEventListener("click", event => {
+      const button = event.target.closest("button[data-era]");
+      if (!button) return;
+
+      selectedEra = button.dataset.era;
+
+      document.querySelectorAll(".era-button").forEach(item => {
+        item.classList.toggle("active", item === button);
+      });
+
+      renderTanks();
+    });
+
+    grid.addEventListener("click", event => {
+      const button = event.target.closest("button[data-tank]");
+      if (button) showTank(button.dataset.tank);
+    });
+
+    search.addEventListener("input", renderTanks);
+    sort.addEventListener("change", renderTanks);
+
+    dialog.addEventListener("click", event => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    renderTanks();
+  </script>
+</body>
+</html>
